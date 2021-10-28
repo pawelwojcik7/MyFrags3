@@ -16,8 +16,6 @@ import android.widget.Button;
  */
 public class Fragment1 extends Fragment {
 
-
-
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -50,15 +48,40 @@ public class Fragment1 extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_1, container, false);
+        Button buttonShuffle = (Button) view.findViewById(R.id.button_shuffle);
+        Button buttonClockwise = (Button) view.findViewById(R.id.button_clockwise);
+        Button buttonHide = (Button) view.findViewById(R.id.button_hide);
+        Button buttonRestore = (Button) view.findViewById(R.id.button_restore);
+        buttonShuffle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (callback != null) callback.onButtonClickShuffle();
+            }
+        });
+        buttonClockwise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (callback != null) callback.onButtonClickClockwise();
+            }
+        });
+        buttonHide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (callback != null) callback.onButtonClickHide();
+            }
+        });
+        buttonRestore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (callback != null) callback.onButtonClickRestore();
+            }
+        });
+        return view;
     }
 
-    @Override    public View onCreateView(LayoutInflater inflater, ViewGroup container,                             Bundle savedInstanceState) {        View view = inflater.inflate(R.layout.fragment_1, container, false);        Button buttonShuffle = (Button) view.findViewById(R.id.button_shuffle);        Button buttonClockwise = (Button) view.findViewById(R.id.button_clockwise);        Button buttonHide = (Button) view.findViewById(R.id.button_hide);        Button buttonRestore = (Button) view.findViewById(R.id.button_restore);        buttonShuffle.setOnClickListener(new View.OnClickListener() {            @Override            public void onClick(View view) {                if (callback != null) callback.onButtonClickShuffle();            }        });        buttonClockwise.setOnClickListener(new View.OnClickListener() {            @Override            public void onClick(View view) {                if (callback != null) callback.onButtonClickClockwise();            }        });        buttonHide.setOnClickListener(new View.OnClickListener() {            @Override            public void onClick(View view) {                if (callback != null) callback.onButtonClickHide();            }        });        buttonRestore.setOnClickListener(new View.OnClickListener() {            @Override            public void onClick(View view) {                if (callback != null) callback.onButtonClickRestore();            }        });        return view;    }
     //1.
     public interface OnButtonClickListener {
         public void onButtonClickShuffle();
@@ -72,7 +95,4 @@ public class Fragment1 extends Fragment {
     public void setOnButtonClickListener(OnButtonClickListener callback) {
         this.callback = callback;
     }
-
-
-
 }
