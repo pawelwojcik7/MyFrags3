@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,78 +16,65 @@ import android.widget.EditText;
 
 
 public class Fragment4 extends Fragment {
+    private FragsData fragmentData;
+    private Observer<Integer> dataChangeObserver;
 
-    private FragsData fragsData;
-    private Observer<Integer> numberObserver;
+    private EditText textInput;
+    private TextWatcher textChangerWatcher;
+    private boolean wasWatcherDeactivated;
 
-    //2.
-    private EditText edit;
-    private TextWatcher textWatcher;
-    private boolean turnOffWatcher;
+    public Fragment4() {}
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-
-
-
-
-
-
+        TransitionInflater inflater = TransitionInflater.from(requireContext());
+        setEnterTransition(inflater.inflateTransition(R.transition.slide_right));
+        setExitTransition(inflater.inflateTransition(R.transition.slide_top));
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_4, container, false);
+        textInput = view.findViewById(R.id.editTextNumber);
 
-        //1.
-        edit = view.findViewById(R.id.editTextNumber);
+        fragmentData = new ViewModelProvider(requireActivity()).get(FragsData.class);
 
-        //2.
-        fragsData = new ViewModelProvider(requireActivity()).get(FragsData.class);
-
-        //3.
-        numberObserver = new Observer<Integer>() {
+        dataChangeObserver = new Observer<Integer>() {
             @Override
             public void onChanged(Integer newInteger) {
-                turnOffWatcher = true;
-                edit.setText(newInteger.toString());
+                wasWatcherDeactivated = true;
+                textInput.setText(newInteger.toString());
             }
         };
+        fragmentData.counter.observe(getViewLifecycleOwner(), dataChangeObserver);
 
-        //4.
-        fragsData.counter.observe(getViewLifecycleOwner(), numberObserver);
-
-        //5.
-        textWatcher = new TextWatcher() {
+        textChangerWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
-
-                if(!turnOffWatcher){
-
+                if(!wasWatcherDeactivated) {
                     Integer i;
-                    try{
+                    try {
                         i = Integer.parseInt( s.toString() );
-                    } catch (NumberFormatException e){
-                        i = fragsData.counter.getValue();
+                    } catch (NumberFormatException e) {
+                        i = fragmentData.counter.getValue();
                     }
-                    fragsData.counter.setValue(i);
+                    fragmentData.counter.setValue(i);
 
                 } else {
-                    turnOffWatcher = !turnOffWatcher;
+                    wasWatcherDeactivated = !wasWatcherDeactivated;
                 }
             }
         };
-
-        //6.
-        edit.addTextChangedListener(textWatcher);
+        textInput.addTextChangedListener(textChangerWatcher);
 
         return view;
     }

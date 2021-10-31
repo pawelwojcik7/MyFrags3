@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,38 +15,48 @@ import android.widget.TextView;
 
 
 public class Fragment3 extends Fragment {
+    private FragsData fragmentData;
+    private Observer<Integer> dataChangeObserver;
 
-    private TextView text;
-    private Button button;
-    private FragsData fragsData;
-    private Observer<Integer> numberObserver;
+    private TextView dataOutputView;
+    private Button decreaseButton;
+
+    public Fragment3() {}
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        TransitionInflater inflater = TransitionInflater.from(requireContext());
+        setEnterTransition(inflater.inflateTransition(R.transition.slide_left));
+        setExitTransition(inflater.inflateTransition(R.transition.slide_top));
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_3, container, false);
-        text = (TextView) view.findViewById(R.id.current);
-        button = (Button) view.findViewById(R.id.button_decrease);
-        fragsData = new ViewModelProvider(requireActivity()).get(FragsData.class);
-        numberObserver = new Observer<Integer>() {
+        dataOutputView = (TextView) view.findViewById(R.id.current);
+        decreaseButton = (Button) view.findViewById(R.id.button_decrease);
+
+        fragmentData = new ViewModelProvider(requireActivity()).get(FragsData.class);
+
+        dataChangeObserver = new Observer<Integer>() {
             @Override
             public void onChanged(Integer newInteger) {
-                text.setText(newInteger.toString());
+                dataOutputView.setText(newInteger.toString());
             }
         };
-        fragsData.counter.observe(getViewLifecycleOwner(), numberObserver);
-        button.setOnClickListener(new View.OnClickListener() {
-                                      @Override
-                                      public void onClick(View view) {
-                                          Integer i = fragsData.counter.getValue();
-                                          fragsData.counter.setValue(--i);
-                                      }
-                                  }
-        );
+        fragmentData.counter.observe(getViewLifecycleOwner(), dataChangeObserver);
+
+        decreaseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Integer i = fragmentData.counter.getValue();
+                fragmentData.counter.setValue(--i);
+            }
+        });
+
         return view;
     }
 }
